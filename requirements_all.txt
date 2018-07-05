@@ -1,0 +1,9 @@
+keras
+tensorflow
+sklearn
+matplotlib
+annoy
+h5py
+Pillow
+streamlit
+pyquery
