@@ -68,42 +68,63 @@ To make full use of this repository, feel free to import the vector_search packa
 #### Search for a similar image to an input image
 First, you need to index your images:
 ```
-python search.py --index_folder dataset --features_path feat --file_mapping index
+python search.py \
+  --index_folder dataset \
+  --features_path feat \
+  --file_mapping index
 ```
 
 Then, you can search through your images:
 ```
-python search.py --input_image image.jpg --features_path feat --file_mapping index
+python search.py \
+  --input_image image.jpg \
+  --features_path feat \
+  --file_mapping index
 ```
 ### Training a custom model
-```python train.py \
- --model_save_path {PATH_TO_SAVE_MODEL} \
- --checkpoint_path {PATH_TO_SAVE_CHECKPOINTS} \
- --glove_path {DIRECOTRY CONTAINING GLOVE VECTORS} \
- --dataset_path {PATH_TO_DATA} \
- --num_epochs {NUMBER_OF_EPOCHS_TO_TRAIN}
- ```
-
-For example, if you've downloaded the pascal dataset, and placed vectors in `models/golve.6B` and want to train for 50 epochs.
+If you've downloaded the pascal dataset, and placed vectors in `models/golve.6B`
+We recommond first training for 2 epochs to evluate performance. Each epoch is around 20 minutes on CPU. Full training on this dataset is around 50 epochs. 
 ```
-python train.py --model_save_path my_model.hdf5 --checkpoint_path checkpoint.hdf5 --glove_path models/glove.6B --dataset_path dataset --num_epochs 50
+python train.py \
+  --model_save_path my_model.hdf5 \
+  --checkpoint_path checkpoint.hdf5 \
+  --glove_path models/glove.6B \
+  --dataset_path dataset \
+  --num_epochs 50
 ```
 
 #### Search for an image using words
 
-For this, you will need to have **trained a custom model** that can map images to words, then use the same command with the additional optional argument pointing to your model.
-
-Similarly, start by indexing your images:
-
-`python search.py --input_folder images --features_path feat --file_mapping index --model_path model.hdf5 --glove_path models/glove.6B`
-
+For this, you will need to have **trained a custom model** that can map images to words.
+Then use the same command with the additional optional argument pointing to your model.
+Start by indexing your images:
+```
+python search.py \
+  --index_folder dataset \
+  --features_path feat \
+  --file_mapping index \
+  --model_path my_model.hdf5 \
+  --glove_path models/glove.6B
+```
 Then, you can search through your images by either passing an image:
+```
+python search.py \
+  --input_image dataset/diningtable/2008_004321.jpg \
+  --features_path feat \
+  --file_mapping index \
+  --model_path my_model.hdf5 \
+  --glove_path models/glove.6B
+```  
 
-`python search.py --input_image image.jpg --features_path feat --file_mapping index --model_path model.hdf5 --glove_path models/glove.6B `
-
-Or a word
-
-`python search.py --input_word street --features_path feat --file_mapping index --model_path model.hdf5 --glove_path models/glove.6B `
+Or search for a word
+```
+python search.py \
+  --input_word street \
+  --features_path feat \
+  --file_mapping index \
+  --model_path my_model.hdf5 \
+  --glove_path models/glove.6B
+```
 
 
 ### Running the demo

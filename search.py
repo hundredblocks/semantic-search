@@ -40,7 +40,7 @@ def check_inputs(folder, image, word, model_path, glove_path):
     if (model_path is True) != (glove_path is True):
         raise ValueError("Ypu must provide a glove path if training custom model, you provided %s for model and %s for "
                          "glove" % (model_path, glove_path))
-    indexing = image is None
+    indexing = image is None and word is None
     pure_image_embeddings = glove_path is None
     return indexing, pure_image_embeddings
 
