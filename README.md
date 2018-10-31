@@ -17,16 +17,14 @@ Read more details abbout why and how you would use this in this blog [post](http
 - Conda
 
 ## Setup
-Clone the repository locally and then, if you only with to use the library without setting up the demo:
+Clone the repository locally and then:
 ```
 conda create -n semantic_search python=3.5 -y
 source activate semantic_search
 pip install -r requirements.txt
 ```
 
-If you intend to use text, download pre-trained GloVe vectors.
-We will use the ones of length 300
-Place them in `models/glove.6B/glove.6B.300d.txt`. We use the ones of length 300.
+If you intend to use text, download pre-trained GloVe vectors (we suggest to use the length 300 vectors):
 ```
 curl -LO http://nlp.stanford.edu/data/glove.6B.zip
 unzip http://nlp.stanford.edu/data/glove.6B.zip
@@ -42,6 +40,23 @@ python downloader.py
 ```
 _Credit to Cyrus Rashtchian, Peter Young, Micah Hodosh, and Julia Hockenmaier for the dataset_
 
+### Running the pipeline end to end
+Here is an example Streamlit tutorial for running the pipeline end to end!
+```
+python demo.py \
+  --features_path feat_300 \
+  --file_mapping_path index_300 \
+  --model_path my_model.hdf5 \
+  --custom_features_path feat_4096 \
+  --custom_features_file_mapping_path index_4096 \
+  --search_key 200 \
+  --train_model True \
+  --generate_image_features True \
+  --generate_custom_features True\
+  --training_epochs 2
+```
+
+### Creating a custom dataset
 Image dataset must be of the format below if you would like to import your own:
 ```
 dataset/
@@ -71,18 +86,19 @@ First, you need to index your images:
 python search.py \
   --index_folder dataset \
   --features_path feat \
-  --file_mapping index
+  --file_mapping index_300
 ```
 
-Then, you can search through your images:
+Then, you can search through your images using this index:
 ```
 python search.py \
-  --input_image image.jpg \
-  --features_path feat \
-  --file_mapping index
+  --input_image dataset/diningtable/2008_004321.jpg \
+  --features_path feat_300 \
+  --file_mapping index_300
 ```
-### Training a custom model
-If you've downloaded the pascal dataset, and placed vectors in `models/golve.6B`
+
+### Training a custom model to map images to words
+After you've downloaded the pascal dataset, and placed vectors in `models/golve.6B`
 We recommond first training for 2 epochs to evluate performance. Each epoch is around 20 minutes on CPU. Full training on this dataset is around 50 epochs. 
 ```
 python train.py \
@@ -93,40 +109,47 @@ python train.py \
   --num_epochs 50
 ```
 
-#### Search for an image using words
-
-For this, you will need to have **trained a custom model** that can map images to words.
-Then use the same command with the additional optional argument pointing to your model.
-Start by indexing your images:
+#### Index your images
+Index the image using the custom trained model to file to not repeatedly do this operation in the future
 ```
 python search.py \
   --index_folder dataset \
-  --features_path feat \
-  --file_mapping index \
+  --features_path feat_4096 \
+  --file_mapping index_4096 \
   --model_path my_model.hdf5 \
   --glove_path models/glove.6B
 ```
-Then, you can search through your images by either passing an image:
+#### Search for an image using image
 ```
 python search.py \
   --input_image dataset/diningtable/2008_004321.jpg \
-  --features_path feat \
-  --file_mapping index \
+  --features_path feat_4096 \
+  --file_mapping index_4096 \
   --model_path my_model.hdf5 \
   --glove_path models/glove.6B
 ```  
 
-Or search for a word
+#### Search for an image using words
 ```
 python search.py \
   --input_word street \
-  --features_path feat \
-  --file_mapping index \
+  --features_path feat_4096 \
+  --file_mapping index_4096 \
   --model_path my_model.hdf5 \
   --glove_path models/glove.6B
-```
-
+  ```
 
 ### Running the demo
-
-To run the demo, run `demo.py`. You may need to train your own model, so make sure to update the flags at the top of the file to match what you are trying to accomplish.
+After training and indexing the model, you can run the demo:
+```
+python demo.py \
+  --features_path feat_300 \
+  --file_mapping_path index_300 \
+  --model_path my_model.hdf5 \
+  --custom_features_path feat_4096 \
+  --custom_features_file_mapping_path index_4096 \
+  --search_key 200 \
+  --train_model False \
+  --generate_image_features False \
+  --generate_custom_features False\
+```

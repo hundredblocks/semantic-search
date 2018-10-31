@@ -10,6 +10,7 @@ from vector_search import vector_search
 import streamlit as st
 import numpy as np
 import inspect
+from argparse import ArgumentParser
 
 # Caching some slow functions
 train_test_split = st.cache(train_test_split)
@@ -22,34 +23,71 @@ def to_array(image_path):
     x_raw = image.img_to_array(img)
     return x_raw.astype(np.uint8)
 
-
 def show_top_n(n, res, search_by_img=True):
     top_n = np.stack([to_array(res[i][1]) for i in range(min(len(res), n))])
     captions = [res[i][2] for i in range(min(len(res), n))]
     if search_by_img:
-        captions[0] = "OG"
+        captions[0] = "Original"
     st.image(top_n, caption=captions)
 
 
 def show_source(fn):
     st.write('```\n%s\n```' % inspect.getsource(fn))
 
+def build_parser():
+    par = ArgumentParser()
+    par.add_argument('--features_path', type=str,
+                     dest='features_path', help='filepath to save/load features in simple model',
+                     default="feat_300")
+    par.add_argument('--file_mapping_path', type=str,
+                     dest='file_mapping_path', help='filepath to index file for simple model',
+                     default="index_300")
+    par.add_argument('--model_path', type=str,
+                     dest='model_path', help='Model path',
+                     default="my_model.hdf5")
+    par.add_argument('--custom_features_path', type=str,
+                     dest='custom_features_path', help='filepath to save/load features in complex model',
+                     default="feat_4096")
+    par.add_argument('--custom_features_file_mapping_path', type=str,
+                     dest='custom_features_file_mapping_path', help='filepath to index in complex model',
+                     default="index_4096")
+    par.add_argument('--search_key', type=int,
+                     dest='search_key', help='Select a search key, 200 suggested',
+                     default=200)
+    par.add_argument('--train_model', type=str,
+                     dest='train_model', help='Boolean True/False to train',
+                     default="False")
+    par.add_argument('--generate_image_features', type=str,
+                     dest='generate_image_features', help='Boolean True/False to generate image features',
+                     default="False")
+    par.add_argument('--generate_custom_features', type=str,
+                     dest='generate_custom_features', help='Boolean True/False to generate custom features',
+                     default="False")
+    par.add_argument('--training_epochs', type=int,
+                     dest='training_epochs', help='Total training epochs for the complex model',
+                     default=2)
+    par.add_argument('--batch_size_training', type=int,
+                     dest='batch_size_training', help='Total training epochs for the complex model',
+                     default=32)
+    return par
+
+def str2bool(v):
+  return v.lower() in ("yes", "true", "t", "1")
 
 if __name__ == '__main__':
-
-    features_path = 'imagenet_features'
-    file_mapping_path = 'file_mapping'
-    custom_features_path = 'custom_features'
-    custom_features_file_mapping_path = 'custom_mapping'
-
-    model_save_path = 'new_trained_model.hdf5'
-    model_load_path = 'cpu_5_hours.hdf5'
-
-    search_key = 200
-
-    train_model = False
-    generate_image_features = False
-    generate_custom_features = False
+    parser = build_parser()
+    options = parser.parse_args()
+    features_path = options.features_path
+    file_mapping_path = options.file_mapping_path
+    model_path = options.model_path
+    custom_features_path = options.custom_features_path
+    custom_features_file_mapping_path = options.custom_features_file_mapping_path
+    search_key = options.search_key
+    train_model = str2bool(options.train_model)
+    generate_image_features = str2bool(options.generate_image_features)
+    generate_custom_features = str2bool(options.generate_custom_features)
+    training_epochs = options.training_epochs
+    batch_size_training = options.batch_size_training
 
     st.title("""Building a Semantic Search Engine""")
     st.image(Image.open('assets/image_search_cover.jpeg'), use_column_width=True)
@@ -123,7 +161,10 @@ if __name__ == '__main__':
 
     with st.echo():
         model = vector_search.load_headless_pretrained_model()
+        print ("generate_image_features: ", generate_image_features)
+        print ("TYPE generate_image_features: ", type(generate_image_features))
         if generate_image_features:
+            print ("Generating image features...")
             images_features, file_index = vector_search.generate_features(image_paths, model)
             vector_search.save_features(features_path, images_features, file_mapping_path, file_index)
         else:
@@ -316,9 +357,10 @@ if __name__ == '__main__':
     """)
     with st.echo():
         if train_model:
+            print ("Training model...")
             with st.echo():
-                num_epochs = 50
-                batch_size = 32
+                num_epochs = training_epochs
+                batch_size = batch_size_training
                 st.write(
                     "Training for %s epochs, this might take a while, "
                     "change train_model to False to load pre-trained model" % num_epochs)
@@ -327,10 +369,10 @@ if __name__ == '__main__':
                 checkpointer = ModelCheckpoint(filepath='checkpoint.hdf5', verbose=1, save_best_only=True)
                 custom_model.fit(X_train, y_train, validation_data=(X_test, y_test),
                                  epochs=num_epochs, batch_size=batch_size, callbacks=[checkpointer])
-                custom_model.save(model_save_path)
+                custom_model.save(model_path)
         else:
-            st.write("Loading model from `%s`" % model_load_path)
-            custom_model = load_model(model_load_path)
+            st.write("Loading model from `%s`" % model_path)
+            custom_model = load_model(model_path)
 
     st.subheader("Building two indices (words and images)")
     st.write("Our model is trained and ready")
@@ -340,6 +382,7 @@ if __name__ == '__main__':
 
     with st.echo():
         if generate_custom_features:
+            print ("Generating custom features...")
             hybrid_images_features, file_mapping = vector_search.generate_features(image_paths, custom_model)
             vector_search.save_features(custom_features_path, hybrid_images_features, custom_features_file_mapping_path,
                                         file_mapping)

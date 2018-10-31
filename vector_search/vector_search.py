@@ -144,6 +144,9 @@ def search_index_by_value(vector, feature_index, item_mapping, top_n=10):
     :return: an array of [index, item, distance] of size top_n
     """
     distances = feature_index.get_nns_by_vector(vector, top_n, include_distances=True)
+    print ("DISTANCES: ", distances)
+    print ("item_mapping: ",item_mapping)
+    print ("type of item mapping", type(item_mapping))
     return [[a, item_mapping[a], distances[1][i]] for i, a in enumerate(distances[0])]
 
 

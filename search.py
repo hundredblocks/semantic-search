@@ -46,6 +46,7 @@ def check_inputs(folder, image, word, model_path, glove_path):
 
 
 def index_images(folder, features_path, mapping_path, model):
+    print ("Now indexing images...")
     _, _, paths = load_paired_img_wrd(folder, [], use_word_vectors=False)
     images_features, file_index = vector_search.generate_features(paths, model)
     vector_search.save_features(features_path, images_features, mapping_path, file_index)
@@ -102,5 +103,5 @@ if __name__ == "__main__":
             # If we are using words to search through our images
             else:
                 image_index = vector_search.index_features(images_features, dims=300)
-                results = vector_search.search_index_by_value(word_vectors[input_word], image_index, file_mapping)
+                results = vector_search.search_index_by_value(word_vectors[input_word], image_index, file_index)
             print(results)
