@@ -13,11 +13,9 @@ It allows you to:
 See examples of usage by following along on this [notebook](http://insight.streamlit.io/0.13.3-8ErS/index.html?id=QAKzY9mLjr4WbTCgxz3XBX).
 Read more details abbout why and how you would use this in this blog [post](https://blog.insightdatascience.com/the-unreasonable-effectiveness-of-deep-learning-representations-4ce83fc663cf).
 
-## Requirements
-- Conda
 
 ## Setup
-Clone the repository locally and then:
+Clone the repository locally and create a virtual environment (conda example below):
 ```
 conda create -n semantic_search python=3.5 -y
 source activate semantic_search
@@ -44,36 +42,17 @@ _Credit to Cyrus Rashtchian, Peter Young, Micah Hodosh, and Julia Hockenmaier fo
 Here is an example Streamlit tutorial for running the pipeline end to end!
 ```
 python demo.py \
-  --features_path feat_300 \
-  --file_mapping_path index_300 \
+  --features_path feat_4096 \
+  --file_mapping_path index_4096 \
   --model_path my_model.hdf5 \
-  --custom_features_path feat_4096 \
-  --custom_features_file_mapping_path index_4096 \
+  --custom_features_path feat_300 \
+  --custom_features_file_mapping_path index_300 \
   --search_key 200 \
   --train_model True \
   --generate_image_features True \
   --generate_custom_features True\
   --training_epochs 2
 ```
-
-### Creating a custom dataset
-Image dataset must be of the format below if you would like to import your own:
-```
-dataset/
-|
-|--- class_0/
-|      |-------image_0
-|      |-------image_1
-|      ...
-|
-|      |-------image_n
-|--- class_1/
-|     ...
-|  
-|--- class_n/
-```
-Each class name should be one word in the english language, or multiple words separated by "_". 
-In our example dataset for example, we rename the "diningtable" folder to dining'_'table.
 
 ### Usage
 To make full use of this repository, feel free to import the vector_search package in your project. For added convenience, a few functions are exposed through a command line API. THey are documented below. 
@@ -86,15 +65,19 @@ First, you need to index your images:
 python search.py \
   --index_folder dataset \
   --features_path feat \
-  --file_mapping index_300
+  --file_mapping index_4096 \
+  --index_boolean True \
+  --features_from_new_model_boolean False
 ```
 
 Then, you can search through your images using this index:
 ```
 python search.py \
-  --input_image dataset/diningtable/2008_004321.jpg \
-  --features_path feat_300 \
-  --file_mapping index_300
+  --input_image dataset/cat/2008_001335.jpg \
+  --features_path feat_4096 \
+  --file_mapping index_4096 \
+  --index_boolean False \
+  --features_from_new_model_boolean False
 ```
 
 ### Training a custom model to map images to words
@@ -114,18 +97,22 @@ Index the image using the custom trained model to file to not repeatedly do this
 ```
 python search.py \
   --index_folder dataset \
-  --features_path feat_4096 \
-  --file_mapping index_4096 \
+  --features_path feat_300 \
+  --file_mapping index_300 \
   --model_path my_model.hdf5 \
+  --index_boolean True \
+  --features_from_new_model_boolean True \
   --glove_path models/glove.6B
 ```
 #### Search for an image using image
 ```
 python search.py \
-  --input_image dataset/diningtable/2008_004321.jpg \
-  --features_path feat_4096 \
-  --file_mapping index_4096 \
+  --input_image dataset/cat/2008_001335.jpg \
+  --features_path feat_300 \
+  --file_mapping index_300 \
   --model_path my_model.hdf5 \
+  --index_boolean False \
+  --features_from_new_model_boolean True \
   --glove_path models/glove.6B
 ```  
 
@@ -133,9 +120,11 @@ python search.py \
 ```
 python search.py \
   --input_word street \
-  --features_path feat_4096 \
-  --file_mapping index_4096 \
+  --features_path feat_300 \
+  --file_mapping index_300 \
   --model_path my_model.hdf5 \
+  --index_boolean False \
+  --features_from_new_model_boolean True \
   --glove_path models/glove.6B
   ```
 
@@ -151,5 +140,24 @@ python demo.py \
   --search_key 200 \
   --train_model False \
   --generate_image_features False \
-  --generate_custom_features False\
+  --generate_custom_features True
 ```
+
+## Creating a custom dataset
+Image dataset must be of the format below if you would like to import your own:
+```
+dataset/
+|
+|--- class_0/
+|      |-------image_0
+|      |-------image_1
+|      ...
+|
+|      |-------image_n
+|--- class_1/
+|     ...
+|  
+|--- class_n/
+```
+Each class name should be one word in the english language, or multiple words separated by "_". 
+In our example dataset for example, we rename the "diningtable" folder to dining'_'table.

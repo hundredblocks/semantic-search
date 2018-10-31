@@ -38,19 +38,19 @@ def build_parser():
     par = ArgumentParser()
     par.add_argument('--features_path', type=str,
                      dest='features_path', help='filepath to save/load features in simple model',
-                     default="feat_300")
+                     default="feat_4096")
     par.add_argument('--file_mapping_path', type=str,
                      dest='file_mapping_path', help='filepath to index file for simple model',
-                     default="index_300")
+                     default="index_4096")
     par.add_argument('--model_path', type=str,
                      dest='model_path', help='Model path',
                      default="my_model.hdf5")
     par.add_argument('--custom_features_path', type=str,
                      dest='custom_features_path', help='filepath to save/load features in complex model',
-                     default="feat_4096")
+                     default="feat_300")
     par.add_argument('--custom_features_file_mapping_path', type=str,
                      dest='custom_features_file_mapping_path', help='filepath to index in complex model',
-                     default="index_4096")
+                     default="index_300")
     par.add_argument('--search_key', type=int,
                      dest='search_key', help='Select a search key, 200 suggested',
                      default=200)
@@ -339,8 +339,8 @@ if __name__ == '__main__':
 
     st.write("And here is the code to build it.")
     with st.echo():
-        custom_model = vector_search.setup_custon_model()
-    show_source(vector_search.setup_custon_model)
+        custom_model = vector_search.setup_custom_model()
+    show_source(vector_search.setup_custom_model)
 
     st.write("""
     We then re-train our model on a training split of our dataset, to learn to predict **the word_vector
