@@ -89,7 +89,7 @@ python train.py \
   --checkpoint_path checkpoint.hdf5 \
   --glove_path models/glove.6B \
   --dataset_path dataset \
-  --num_epochs 1
+  --num_epochs 30
 ```
 
 #### Index your images
@@ -137,11 +137,10 @@ python demo.py \
   --model_path my_model.hdf5 \
   --custom_features_path feat_300 \
   --custom_features_file_mapping_path index_300 \
-  --search_key 0 \
+  --search_key 872 \
   --train_model False \
   --generate_image_features False \
-  --generate_custom_features False \
-  --image_path_number 0
+  --generate_custom_features False 
 ```
 
 ## Creating a custom dataset
