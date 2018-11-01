@@ -69,6 +69,9 @@ def build_parser():
     par.add_argument('--batch_size_training', type=int,
                      dest='batch_size_training', help='Total training epochs for the complex model',
                      default=32)
+    par.add_argument('--image_path_number', type=int,
+                 dest='image_path_number', help='Different image paths to use',
+                 default=200)
     return par
 
 def str2bool(v):
@@ -88,6 +91,7 @@ if __name__ == '__main__':
     generate_custom_features = str2bool(options.generate_custom_features)
     training_epochs = options.training_epochs
     batch_size_training = options.batch_size_training
+    image_path_number = options.image_path_number
 
     st.title("""Building a Semantic Search Engine""")
     st.image(Image.open('assets/image_search_cover.jpeg'), use_column_width=True)
@@ -161,8 +165,6 @@ if __name__ == '__main__':
 
     with st.echo():
         model = vector_search.load_headless_pretrained_model()
-        print ("generate_image_features: ", generate_image_features)
-        print ("TYPE generate_image_features: ", type(generate_image_features))
         if generate_image_features:
             print ("Generating image features...")
             images_features, file_index = vector_search.generate_features(image_paths, model)
@@ -201,7 +203,7 @@ if __name__ == '__main__':
     Which class do you think this image is labeled as?
     """)
 
-    st.image(to_array(image_paths[200]), caption="Cat or bottle")
+    st.image(to_array(image_paths[image_path_number]), caption="Cat or bottle")
 
     st.write("""
     The correct answer is **bottle** ... This is an actual issue that comes up often in real datasets. Labeling images as 
@@ -399,20 +401,20 @@ if __name__ == '__main__':
     st.write("We can now easily extract tags from any image")
     st.write("Let's try with our cat/bottle image")
 
-    st.image(to_array(image_paths[200]))
-    st.write('Generating tags for `%s`' % file_mapping[200])
+    st.image(to_array(image_paths[image_path_number]))
+    st.write('Generating tags for `%s`' % file_mapping[image_path_number])
     with st.echo():
-        results = vector_search.search_index_by_value(hybrid_images_features[200], word_index, word_mapping)
+        results = vector_search.search_index_by_value(hybrid_images_features[image_path_number], word_index, word_mapping)
     show_source(vector_search.search_index_by_value)
     st.write('\n'.join('- `%s`' % elt for elt in results))
 
     st.write("These results are reasonable, let's try to see if we can detect more than the bottle in the "
              "messy image below.")
 
-    st.image(to_array(image_paths[223]))
-    st.write('Generating tags for `%s`' % file_mapping[223])
+    st.image(to_array(image_paths[image_path_number+23]))
+    st.write('Generating tags for `%s`' % file_mapping[image_path_number+23])
     with st.echo():
-        results = vector_search.search_index_by_value(hybrid_images_features[223], word_index, word_mapping)
+        results = vector_search.search_index_by_value(hybrid_images_features[image_path_number+23], word_index, word_mapping)
     st.write('\n'.join('- `%s`' % elt for elt in results))
 
     st.write("The model learns to extract **many relevant tags**, even from categories that it was not trained on!")

@@ -48,12 +48,15 @@ def check_inputs(folder, image, word, model_path, glove_path):
 
 def index_images(folder, features_path, mapping_path, model, features_from_new_model_boolean, glove_path):
     print ("Now indexing images...")
-    print ("features_from_new_model_boolean: ", features_from_new_model_boolean)
-    print ("TYPE features_from_new_model_boolean:", features_from_new_model_boolean)
     # Use word vectors if leveraging the new model
+    if features_from_new_model_boolean:
+        word_vectors=vector_search.load_glove_vectors(glove_path)
+    else:
+        word_vectors=[]
+    # Use utiliy function
     _, _, paths = load_paired_img_wrd(
         folder=folder, 
-        word_vectors=vector_search.load_glove_vectors(glove_path), 
+        word_vectors=word_vectors,
         use_word_vectors=features_from_new_model_boolean)
     images_features, file_index = vector_search.generate_features(paths, model)
     vector_search.save_features(features_path, images_features, mapping_path, file_index)
@@ -88,7 +91,7 @@ def build_index_and_search_through_it(images_features, file_index):
     else:
         word_vectors = vector_search.load_glove_vectors(glove_path)
         # If we are searching for tags for an image
-        if not index_boolean:
+        if not input_word:
             # Work on a single image instead of indexing
             search_key = get_index(input_image, file_index)
             word_index, word_mapping = vector_search.build_word_index(word_vectors)

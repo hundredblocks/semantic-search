@@ -63,8 +63,8 @@ To make full use of this repository, feel free to import the vector_search packa
 First, you need to index your images:
 ```
 python search.py \
-  --index_folder dataset \
-  --features_path feat \
+  --index_folder demo_data \
+  --features_path feat_4096 \
   --file_mapping index_4096 \
   --index_boolean True \
   --features_from_new_model_boolean False
@@ -73,7 +73,7 @@ python search.py \
 Then, you can search through your images using this index:
 ```
 python search.py \
-  --input_image dataset/cat/2008_001335.jpg \
+  --input_image demo_data/cat/2008_001335.jpg \
   --features_path feat_4096 \
   --file_mapping index_4096 \
   --index_boolean False \
@@ -85,18 +85,18 @@ After you've downloaded the pascal dataset, and placed vectors in `models/golve.
 We recommond first training for 2 epochs to evluate performance. Each epoch is around 20 minutes on CPU. Full training on this dataset is around 50 epochs. 
 ```
 python train.py \
-  --model_save_path my_model.hdf5 \
-  --checkpoint_path checkpoint.hdf5 \
+  --model_save_path small_model.hdf5 \
+  --checkpoint_path small_checkpoint.hdf5 \
   --glove_path models/glove.6B \
   --dataset_path dataset \
-  --num_epochs 50
+  --num_epochs 1
 ```
 
 #### Index your images
 Index the image using the custom trained model to file to not repeatedly do this operation in the future
 ```
 python search.py \
-  --index_folder dataset \
+  --index_folder demo_data \
   --features_path feat_300 \
   --file_mapping index_300 \
   --model_path my_model.hdf5 \
@@ -107,7 +107,7 @@ python search.py \
 #### Search for an image using image
 ```
 python search.py \
-  --input_image dataset/cat/2008_001335.jpg \
+  --input_image demo_data/cat/2008_001335.jpg \
   --features_path feat_300 \
   --file_mapping index_300 \
   --model_path my_model.hdf5 \
@@ -119,7 +119,7 @@ python search.py \
 #### Search for an image using words
 ```
 python search.py \
-  --input_word street \
+  --input_word cat \
   --features_path feat_300 \
   --file_mapping index_300 \
   --model_path my_model.hdf5 \
@@ -132,15 +132,16 @@ python search.py \
 After training and indexing the model, you can run the demo:
 ```
 python demo.py \
-  --features_path feat_300 \
-  --file_mapping_path index_300 \
+  --features_path feat_4096 \
+  --file_mapping_path index_4096 \
   --model_path my_model.hdf5 \
-  --custom_features_path feat_4096 \
-  --custom_features_file_mapping_path index_4096 \
-  --search_key 200 \
+  --custom_features_path feat_300 \
+  --custom_features_file_mapping_path index_300 \
+  --search_key 0 \
   --train_model False \
   --generate_image_features False \
-  --generate_custom_features True
+  --generate_custom_features False \
+  --image_path_number 0
 ```
 
 ## Creating a custom dataset
