@@ -30,7 +30,6 @@ def show_top_n(n, res, search_by_img=True):
         captions[0] = "Original"
     st.image(top_n, caption=captions)
 
-
 def show_source(fn):
     st.write('```\n%s\n```' % inspect.getsource(fn))
 
@@ -69,10 +68,22 @@ def build_parser():
     par.add_argument('--batch_size_training', type=int,
                      dest='batch_size_training', help='Total training epochs for the complex model',
                      default=32)
+    par.add_argument('--glove_model_path', type=str,
+                     dest='glove_model_path', help='Relative destination to glove model path',
+                     default="models/glove.6B")
+    par.add_argument('--data_path', type=str,
+                     dest='data_path', help='Relative destination to dataset folder path',
+                     default="dataset")
     return par
 
 def str2bool(v):
   return v.lower() in ("yes", "true", "t", "1")
+
+def load_images_vectors_paths(glove_model_path, data_path):
+    word_vectors = vector_search.load_glove_vectors(glove_model_path)
+    images, vectors, image_paths = load_paired_img_wrd(data_path, word_vectors)
+    return images, vectors, image_paths, word_vectors
+
 
 if __name__ == '__main__':
     parser = build_parser()
@@ -88,6 +99,8 @@ if __name__ == '__main__':
     generate_custom_features = str2bool(options.generate_custom_features)
     training_epochs = options.training_epochs
     batch_size_training = options.batch_size_training
+    glove_model_path = options.glove_model_path
+    data_path = options.data_path
 
     st.title("""Building a Semantic Search Engine""")
     st.image(Image.open('assets/image_search_cover.jpeg'), use_column_width=True)
@@ -123,9 +136,12 @@ if __name__ == '__main__':
     which we will use when we incorporate text.
     """)
 
-    with st.echo():
-        word_vectors = vector_search.load_glove_vectors("models/glove.6B")
-        images, vectors, image_paths = load_paired_img_wrd('dataset', word_vectors)
+    if not train_model:
+        # It is possible to do this loading in the background while other things are surfaced to users
+        with st.echo():
+            images, vectors, image_paths, word_vectors = load_images_vectors_paths(glove_model_path, data_path)
+    else:
+        images, vectors, image_paths, word_vectors = load_images_vectors_paths(glove_model_path, data_path)
     st.write("Here is what our load function looks like:")
     show_source(load_paired_img_wrd)
     all_labels = [fold.split("/")[1] for fold in image_paths]
@@ -387,16 +403,17 @@ if __name__ == '__main__':
 
     st.write("Now, to build a fast image index, we need to run a forward pass on every image with our new model")
 
-    with st.echo():
-        if generate_custom_features:
-            print ("Generating custom features...")
-            hybrid_images_features, file_mapping = vector_search.generate_features(image_paths, custom_model)
-            vector_search.save_features(custom_features_path, hybrid_images_features, custom_features_file_mapping_path,
-                                        file_mapping)
-        else:
-            hybrid_images_features, file_mapping = vector_search.load_features(custom_features_path,
-                                                                               custom_features_file_mapping_path)
-        image_index = vector_search.index_features(hybrid_images_features, dims=300)
+    # Load or generate the custom features
+    if generate_custom_features:
+        print ("Generating custom features...")
+        hybrid_images_features, file_mapping = vector_search.generate_features(image_paths, custom_model)
+        vector_search.save_features(custom_features_path, hybrid_images_features, custom_features_file_mapping_path,
+                                    file_mapping)
+    else:
+        hybrid_images_features, file_mapping = vector_search.load_features(custom_features_path,
+                                                                           custom_features_file_mapping_path)
+    image_index = vector_search.index_features(hybrid_images_features, dims=300)
+
     st.write('Here are what our embeddings look like now for the first 20 images')
     st.write('They are of length 300, just **like our word vectors**!')
     st.write(hybrid_images_features[:20])

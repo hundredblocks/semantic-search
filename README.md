@@ -19,13 +19,14 @@ Clone the repository locally and create a virtual environment (conda example bel
 ```
 conda create -n semantic_search python=3.5 -y
 source activate semantic_search
+cd semantic_search
 pip install -r requirements.txt
 ```
 
 If you intend to use text, download pre-trained GloVe vectors (we suggest to use the length 300 vectors):
 ```
 curl -LO http://nlp.stanford.edu/data/glove.6B.zip
-unzip http://nlp.stanford.edu/data/glove.6B.zip
+unzip glove.6B.zip
 mkdir models
 mkdir models/glove.6B
 mv glove.6B.300d.txt models/glove.6B/
@@ -35,6 +36,9 @@ Download an example image dataset by using:
 ```
 mkdir dataset
 python downloader.py
+mv dataset/diningtable dataset/dining_table
+mv dataset/pottedplant dataset/potted_plant
+mv dataset/tvmonitor dataset/tv_monitor
 ```
 _Credit to Cyrus Rashtchian, Peter Young, Micah Hodosh, and Julia Hockenmaier for the dataset_
 
@@ -47,15 +51,19 @@ python demo.py \
   --model_path my_model.hdf5 \
   --custom_features_path feat_300 \
   --custom_features_file_mapping_path index_300 \
-  --search_key 200 \
+  --search_key 872 \
   --train_model True \
   --generate_image_features True \
-  --generate_custom_features True\
-  --training_epochs 2
+  --generate_custom_features True \
+  --training_epochs 1 \
+  --glove_model_path models/glove.6B \
+  --data_path dataset
+
 ```
 
 ### Usage
-To make full use of this repository, feel free to import the vector_search package in your project. For added convenience, a few functions are exposed through a command line API. THey are documented below. 
+To make full use of this repository, feel free to import the vector_search package in your project. For added convenience, 
+a few functions are exposed through a command line API. They are documented below. 
 
 ### Using pre-trained models for image search
 
