@@ -5,6 +5,11 @@ from keras.preprocessing import image
 
 
 def load_paired_img_wrd(folder, word_vectors, use_word_vectors=True):
+    '''
+    If use_word_vectors = true, and using VGG16 with Imagenet:
+    Will have 300 embedding layer at end of network
+    Instead of 4096 imagenet class layer at the end of the network
+    '''
     class_names = [fold for fold in os.listdir(folder) if ".DS" not in fold]
     image_list = []
     labels_list = []

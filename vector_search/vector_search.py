@@ -24,6 +24,7 @@ def load_headless_pretrained_model():
     Loads the pretrained version of VGG with the last layer cut off
     :return: pre-trained headless VGG16 Keras Model
     """
+    print ("Loading headless pretrained model...")
     pretrained_vgg16 = VGG16(weights='imagenet', include_top=True)
     model = Model(inputs=pretrained_vgg16.input,
                   outputs=pretrained_vgg16.get_layer('fc2').output)
@@ -38,6 +39,7 @@ def generate_features(image_paths, model):
     :param model: pre-trained model
     :return: array of last-layer activations, and mapping from array_index to file_path
     """
+    print ("Generating features...")
     start = time.time()
     images = np.zeros(shape=(len(image_paths), 224, 224, 3))
     file_mapping = {i: f for i, f in enumerate(image_paths)}
@@ -66,6 +68,7 @@ def save_features(features_filename, features, mapping_filename, file_mapping):
     :param mapping_filename: path to save mapping to
     :param file_mapping: mapping from array_index to file_path/plaintext_word
     """
+    print ("Saving features...")
     np.save('%s.npy' % features_filename, features)
     with open('%s.json' % mapping_filename, 'w') as index_file:
         json.dump(file_mapping, index_file)
@@ -80,6 +83,7 @@ def load_features(features_filename, mapping_filename):
     :return: feature array and file_item mapping to disk
 
     """
+    print ("Loading features...")
     images_features = np.load('%s.npy' % features_filename)
     with open('%s.json' % mapping_filename) as f:
         index_str = json.load(f)
@@ -95,6 +99,7 @@ def index_features(features, n_trees=1000, dims=4096, is_dict=False):
     :param dims: dimension of our features
     :return: an Annoy tree of indexed features
     """
+    print ("Indexing features...")
     feature_index = AnnoyIndex(dims, metric='angular')
     for i, row in enumerate(features):
         vec = row
@@ -111,6 +116,7 @@ def build_word_index(word_vectors):
     :param word_vectors: a list of pre-trained word vectors loaded from a file
     :return: an Annoy tree of indexed word vectors and a mapping from the Annoy index to the word string
     """
+    print ("Building word index ...")
     logging.info("Creating mapping and list of features")
     word_list = [(i, word) for i, word in enumerate(word_vectors)]
     word_mapping = {k: v for k, v in word_list}
@@ -180,13 +186,14 @@ def get_class_weights_from_vgg(save_weights=False, filename='class_weights'):
     return class_weights
 
 
-def setup_custon_model(intermediate_dim=2000, word_embedding_dim=300):
+def setup_custom_model(intermediate_dim=2000, word_embedding_dim=300):
     """
     Builds a custom model taking the fc2 layer of VGG16 and adding two dense layers on top
     :param intermediate_dim: dimension of the intermediate dense layer
     :param word_embedding_dim: dimension of the final layer, which should match the size of our word embeddings
     :return: a Keras model with the backbone frozen, and the upper layers ready to be trained
     """
+    print ("Setting up custom model ...")
     headless_pretrained_vgg16 = VGG16(weights='imagenet', include_top=True, input_shape=(224, 224, 3))
     x = headless_pretrained_vgg16.get_layer('fc2').output
 

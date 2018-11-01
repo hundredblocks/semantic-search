@@ -38,7 +38,7 @@ if __name__ == "__main__":
     X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=2)
 
     checkpointer = ModelCheckpoint(filepath=checkpoint_path, verbose=1, save_best_only=True)
-    custom_model = vector_search.setup_custon_model()
+    custom_model = vector_search.setup_custom_model()
     custom_model.fit(X_train, y_train, validation_data=(X_test, y_test),
                      epochs=num_epochs, batch_size=32, callbacks=[checkpointer])
     custom_model.save(model_save_path)
