@@ -63,7 +63,7 @@ To make full use of this repository, feel free to import the vector_search packa
 First, you need to index your images:
 ```
 python search.py \
-  --index_folder demo_data \
+  --index_folder dataset \
   --features_path feat_4096 \
   --file_mapping index_4096 \
   --index_boolean True \
@@ -73,7 +73,7 @@ python search.py \
 Then, you can search through your images using this index:
 ```
 python search.py \
-  --input_image demo_data/cat/2008_001335.jpg \
+  --input_image dataset/cat/2008_001335.jpg \
   --features_path feat_4096 \
   --file_mapping index_4096 \
   --index_boolean False \
@@ -85,8 +85,8 @@ After you've downloaded the pascal dataset, and placed vectors in `models/golve.
 We recommond first training for 2 epochs to evluate performance. Each epoch is around 20 minutes on CPU. Full training on this dataset is around 50 epochs. 
 ```
 python train.py \
-  --model_save_path small_model.hdf5 \
-  --checkpoint_path small_checkpoint.hdf5 \
+  --model_save_path my_model.hdf5 \
+  --checkpoint_path checkpoint.hdf5 \
   --glove_path models/glove.6B \
   --dataset_path dataset \
   --num_epochs 1
@@ -96,7 +96,7 @@ python train.py \
 Index the image using the custom trained model to file to not repeatedly do this operation in the future
 ```
 python search.py \
-  --index_folder demo_data \
+  --index_folder dataset \
   --features_path feat_300 \
   --file_mapping index_300 \
   --model_path my_model.hdf5 \
@@ -107,7 +107,7 @@ python search.py \
 #### Search for an image using image
 ```
 python search.py \
-  --input_image demo_data/cat/2008_001335.jpg \
+  --input_image dataset/cat/2008_001335.jpg \
   --features_path feat_300 \
   --file_mapping index_300 \
   --model_path my_model.hdf5 \
