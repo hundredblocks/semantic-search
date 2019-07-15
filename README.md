@@ -11,7 +11,7 @@ It allows you to:
 - Generate tags for any image
 
 See examples of usage by following along on this [notebook](http://insight.streamlit.io/0.13.3-8ErS/index.html?id=QAKzY9mLjr4WbTCgxz3XBX).
-Read more details abbout why and how you would use this in this blog [post](https://blog.insightdatascience.com/the-unreasonable-effectiveness-of-deep-learning-representations-4ce83fc663cf).
+Read more details about why and how you would use this in this blog [post](https://blog.insightdatascience.com/the-unreasonable-effectiveness-of-deep-learning-representations-4ce83fc663cf).
 
 
 ## Setup
