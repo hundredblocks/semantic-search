@@ -167,5 +167,5 @@ dataset/
 |  
 |--- class_n/
 ```
-Each class name should be one word in the english language, or multiple words separated by "_". 
-In our example dataset for example, we rename the "diningtable" folder to dining'_'table.
+Each class name should be one word in the english language, or multiple words separated by "\_". 
+In our example dataset for example, we rename the "diningtable" folder to dining'\_'table.
